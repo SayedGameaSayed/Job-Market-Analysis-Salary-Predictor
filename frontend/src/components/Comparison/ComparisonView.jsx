@@ -21,7 +21,7 @@ const GROUPS = [
       'France', 'Spain', 'Australia', 'Netherlands', 'Brazil'],
   },
   {
-    label: 'Experience Levels', key: 'experienceLevels', icon: '📈',
+    label: 'Experience', key: 'experienceLevels', icon: '📈',
     options: ['Entry-level', 'Mid-level', 'Senior', 'Executive'],
   },
 ];
@@ -100,74 +100,80 @@ export default function ComparisonView() {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} lg={4}>
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
-          <Paper sx={{ p: 3, border: 1, borderColor: 'divider', position: 'sticky', top: 90 }}>
+      <Grid item xs={12}>
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+          <Paper sx={{ p: 3, border: 1, borderColor: 'divider' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h6" display="flex" alignItems="center" gap={1}>
-                <CompareArrowsIcon color="warning" /> Select
+                <CompareArrowsIcon color="warning" /> Compare Salaries
               </Typography>
               {totalSelected > 0 && (
                 <Chip label={`${totalSelected} selected`} color="warning" size="small" />
               )}
             </Box>
 
-            {GROUPS.map((group) => {
-              const selected = selections[group.key];
-              return (
-                <Box key={group.key} sx={{ mb: 2.5 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                    <Typography variant="subtitle2" fontWeight={700}>
-                      {group.icon} {group.label}
-                    </Typography>
-                    {selected.length > 0 && (
-                      <Chip label={selected.length} size="small" color="primary" sx={{ height: 22 }} />
-                    )}
-                  </Box>
+            {/* Three groups side by side horizontally */}
+            <Grid container spacing={2} mb={2}>
+              {GROUPS.map((group) => {
+                const selected = selections[group.key];
+                return (
+                  <Grid item xs={12} md={4} key={group.key}>
+                    <Box>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                        <Typography variant="subtitle2" fontWeight={700} fontSize="0.85rem">
+                          {group.icon} {group.label}
+                        </Typography>
+                        {selected.length > 0 && (
+                          <Chip label={selected.length} size="small" color="primary" sx={{ height: 20, fontSize: '0.7rem' }} />
+                        )}
+                      </Box>
 
-                  {selected.length > 0 && (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
-                      {selected.map(s => (
-                        <Chip
-                          key={s}
-                          label={s}
-                          size="small"
-                          color="primary"
-                          variant="outlined"
-                          onDelete={() => toggle(group.key, s)}
-                          deleteIcon={<CheckCircleIcon />}
-                          sx={{ fontWeight: 600 }}
-                        />
-                      ))}
-                    </Box>
-                  )}
-
-                  <Paper variant="outlined" sx={{ p: 1.5, borderRadius: 2, bgcolor: 'background.default' }}>
-                    {group.options.map((opt) => {
-                      const isChecked = selected.includes(opt);
-                      return (
-                        <Box
-                          key={opt}
-                          onClick={() => toggle(group.key, opt)}
-                          sx={{
-                            display: 'flex', alignItems: 'center', gap: 1,
-                            py: 0.6, px: 1, cursor: 'pointer', borderRadius: 1,
-                            bgcolor: isChecked ? 'primary.main' + '18' : 'transparent',
-                            '&:hover': { bgcolor: isChecked ? 'primary.main' + '25' : 'action.hover' },
-                            mb: 0.3,
-                          }}
-                        >
-                          <Checkbox checked={isChecked} size="small" sx={{ p: 0.3 }} />
-                          <Typography variant="body1" fontWeight={isChecked ? 600 : 400}>
-                            {opt}
-                          </Typography>
+                      {/* Selected chips */}
+                      {selected.length > 0 && (
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.3, mb: 0.5 }}>
+                          {selected.map(s => (
+                            <Chip
+                              key={s}
+                              label={s}
+                              size="small"
+                              color="primary"
+                              variant="outlined"
+                              onDelete={() => toggle(group.key, s)}
+                              deleteIcon={<CheckCircleIcon />}
+                              sx={{ fontWeight: 600, fontSize: '0.7rem', height: 22 }}
+                            />
+                          ))}
                         </Box>
-                      );
-                    })}
-                  </Paper>
-                </Box>
-              );
-            })}
+                      )}
+
+                      {/* Scrollable options list */}
+                      <Paper variant="outlined" sx={{ p: 0.5, borderRadius: 2, bgcolor: 'background.default', maxHeight: 180, overflow: 'auto' }}>
+                        {group.options.map((opt) => {
+                          const isChecked = selected.includes(opt);
+                          return (
+                            <Box
+                              key={opt}
+                              onClick={() => toggle(group.key, opt)}
+                              sx={{
+                                display: 'flex', alignItems: 'center', gap: 0.5,
+                                py: 0.3, px: 0.8, cursor: 'pointer', borderRadius: 0.5,
+                                bgcolor: isChecked ? 'primary.main' + '18' : 'transparent',
+                                '&:hover': { bgcolor: isChecked ? 'primary.main' + '25' : 'action.hover' },
+                              }}
+                            >
+                              <Checkbox checked={isChecked} size="small" sx={{ p: 0.2 }} />
+                              <Typography variant="body2" fontWeight={isChecked ? 600 : 400}>
+                                {opt}
+                              </Typography>
+                            </Box>
+                          );
+                        })}
+                      </Paper>
+                    </Box>
+                  </Grid>
+                );
+              })}
+            </Grid>
 
             <Button
               variant="contained"
@@ -176,7 +182,7 @@ export default function ComparisonView() {
               onClick={handleCompare}
               disabled={totalSelected === 0}
               sx={{
-                py: 1.8, fontSize: '1.05rem', fontWeight: 700,
+                py: 1.5, fontSize: '1rem', fontWeight: 700,
                 background: 'linear-gradient(135deg, #f6a85b 0%, #e8913a 100%)',
                 '&:disabled': { background: '#555' },
               }}
@@ -187,8 +193,9 @@ export default function ComparisonView() {
         </motion.div>
       </Grid>
 
-      <Grid item xs={12} lg={8}>
-        {error && <Alert severity="warning" sx={{ borderRadius: 3, mb: 2 }}>{error}</Alert>}
+      {/* Results */}
+      <Grid item xs={12}>
+        {error && <Alert severity="warning" sx={{ borderRadius: 3 }}>{error}</Alert>}
         {result && (
           <>
             {renderTable('By Job Title', result.by_job, '💼')}
@@ -198,17 +205,12 @@ export default function ComparisonView() {
         )}
         {!result && !error && (
           <Paper sx={{
-            p: 8, textAlign: 'center', border: 1, borderColor: 'divider',
-            minHeight: 400, display: 'flex', flexDirection: 'column',
+            p: 6, textAlign: 'center', border: 1, borderColor: 'divider',
+            minHeight: 200, display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
           }}>
-            <CompareArrowsIcon sx={{ fontSize: 100, opacity: 0.15, color: 'warning.main', mb: 3 }} />
-            <Typography variant="h5" color="text.secondary" gutterBottom>
-              Nothing to compare yet
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400 }}>
-              Select job titles, countries, or experience levels on the left, then click the button to see side-by-side salary statistics.
-            </Typography>
+            <CompareArrowsIcon sx={{ fontSize: 60, opacity: 0.15, color: 'warning.main', mb: 2 }} />
+            <Typography variant="h6" color="text.secondary">Select options and click Compare</Typography>
           </Paper>
         )}
       </Grid>
