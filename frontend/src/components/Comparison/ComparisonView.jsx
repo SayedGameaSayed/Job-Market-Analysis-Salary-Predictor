@@ -1,9 +1,15 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   Paper, Typography, TextField, MenuItem, Button, Grid, Table, TableBody,
-  TableCell, TableContainer, TableHead, TableRow, Chip, Alert,
+  TableCell, TableContainer, TableHead, TableRow, Chip, Alert, Box,
 } from '@mui/material';
-import { compareData, getUniqueValues } from '../../api/client';
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import { compareData } from '../../api/client';
+
+const JOB_OPTIONS = ['Data Scientist', 'Data Engineer', 'Data Analyst', 'Machine Learning Engineer', 'Analytics Engineer', 'Data Architect', 'Data DevOps Engineer', 'Research Scientist', 'BI Analyst'];
+const COUNTRY_OPTIONS = ['United States', 'United Kingdom', 'Germany', 'Canada', 'India', 'France', 'Spain', 'Australia', 'Netherlands', 'Brazil'];
+const EXP_OPTIONS = ['Entry-level', 'Mid-level', 'Senior', 'Executive'];
 
 export default function ComparisonView() {
   const [jobTitles, setJobTitles] = useState([]);
@@ -14,102 +20,114 @@ export default function ComparisonView() {
 
   const handleCompare = async () => {
     if (!jobTitles.length && !countries.length && !experienceLevels.length) {
-      setError('Select at least one dimension');
+      setError('Select at least one dimension to compare');
       return;
     }
     setError('');
     try {
       const res = await compareData({ job_titles: jobTitles, countries: countries, experience_levels: experienceLevels });
       setResult(res);
-    } catch (err) {
-      setError('Comparison failed - no matching data');
+    } catch {
+      setError('No matching data found for the selected options.');
     }
   };
 
-  const renderTable = (label, data) => {
+  const renderTable = (label, data, icon) => {
     if (!data) return null;
     const rows = Object.entries(data).map(([key, val]) => ({ key, ...val }));
+
     return (
-      <Paper sx={{ p: 2, mt: 2 }}>
-        <Typography variant="h6" mb={1}>{label}</Typography>
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell align="right">Count</TableCell>
-                <TableCell align="right">Mean</TableCell>
-                <TableCell align="right">Min</TableCell>
-                <TableCell align="right">Max</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((r) => (
-                <TableRow key={r.key}>
-                  <TableCell><Chip label={r.key} size="small" /></TableCell>
-                  <TableCell align="right">{r.count}</TableCell>
-                  <TableCell align="right">${r.mean?.toLocaleString()}</TableCell>
-                  <TableCell align="right">${r.min?.toLocaleString()}</TableCell>
-                  <TableCell align="right">${r.max?.toLocaleString()}</TableCell>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+        <Paper sx={{ p: 2.5, mt: 2.5, border: 1, borderColor: 'divider' }}>
+          <Typography variant="subtitle1" fontWeight={600} mb={1.5} display="flex" alignItems="center" gap={1}>
+            {icon} {label}
+          </Typography>
+          <TableContainer>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 600 }}>Count</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 600 }}>Mean</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 600 }}>Min</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 600 }}>Max</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 600 }}>Std Dev</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
+              </TableHead>
+              <TableBody>
+                {rows.map((r) => (
+                  <TableRow key={r.key} hover>
+                    <TableCell><Chip label={r.key} size="small" variant="outlined" /></TableCell>
+                    <TableCell align="right">{r.count}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: 'primary.main' }}>${r.mean?.toLocaleString()}</TableCell>
+                    <TableCell align="right">${r.min?.toLocaleString()}</TableCell>
+                    <TableCell align="right">${r.max?.toLocaleString()}</TableCell>
+                    <TableCell align="right">${Math.round(r.std)?.toLocaleString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+      </motion.div>
     );
   };
 
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} md={4}>
-        <Paper sx={{ p: 2 }}>
-          <Typography variant="h6" mb={2}>Compare Salaries</Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField select fullWidth size="small" label="Job Titles" SelectProps={{ multiple: true }}
-                value={jobTitles} onChange={(e) => setJobTitles(e.target.value)}>
-                <MenuItem value="Data Scientist">Data Scientist</MenuItem>
-                <MenuItem value="Data Engineer">Data Engineer</MenuItem>
-                <MenuItem value="Data Analyst">Data Analyst</MenuItem>
-                <MenuItem value="Machine Learning Engineer">ML Engineer</MenuItem>
-                <MenuItem value="Analytics Engineer">Analytics Engineer</MenuItem>
-              </TextField>
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
+          <Paper sx={{ p: 3, border: 1, borderColor: 'divider' }}>
+            <Typography variant="h6" mb={2} display="flex" alignItems="center" gap={1}>
+              <CompareArrowsIcon color="warning" /> Select Categories
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField select fullWidth size="small" label="Job Titles" SelectProps={{ multiple: true, renderValue: (selected) => selected.join(', ') }}
+                  value={jobTitles} onChange={(e) => setJobTitles(e.target.value)}>
+                  {JOB_OPTIONS.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
+                </TextField>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField select fullWidth size="small" label="Countries" SelectProps={{ multiple: true, renderValue: (selected) => selected.join(', ') }}
+                  value={countries} onChange={(e) => setCountries(e.target.value)}>
+                  {COUNTRY_OPTIONS.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
+                </TextField>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField select fullWidth size="small" label="Experience Level" SelectProps={{ multiple: true, renderValue: (selected) => selected.join(', ') }}
+                  value={experienceLevels} onChange={(e) => setExperienceLevels(e.target.value)}>
+                  {EXP_OPTIONS.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
+                </TextField>
+              </Grid>
+              <Grid item xs={12}>
+                <Button variant="contained" fullWidth size="large" onClick={handleCompare}
+                  sx={{ background: 'linear-gradient(135deg, #f6a85b 0%, #e8913a 100%)' }}>
+                  Compare Salaries
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <TextField select fullWidth size="small" label="Countries" SelectProps={{ multiple: true }}
-                value={countries} onChange={(e) => setCountries(e.target.value)}>
-                <MenuItem value="United States">United States</MenuItem>
-                <MenuItem value="United Kingdom">United Kingdom</MenuItem>
-                <MenuItem value="Germany">Germany</MenuItem>
-                <MenuItem value="Canada">Canada</MenuItem>
-                <MenuItem value="India">India</MenuItem>
-              </TextField>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField select fullWidth size="small" label="Experience" SelectProps={{ multiple: true }}
-                value={experienceLevels} onChange={(e) => setExperienceLevels(e.target.value)}>
-                <MenuItem value="Entry-level">Entry-level</MenuItem>
-                <MenuItem value="Mid-level">Mid-level</MenuItem>
-                <MenuItem value="Senior">Senior</MenuItem>
-                <MenuItem value="Executive">Executive</MenuItem>
-              </TextField>
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" fullWidth onClick={handleCompare}>Compare</Button>
-            </Grid>
-          </Grid>
-        </Paper>
+          </Paper>
+        </motion.div>
       </Grid>
 
       <Grid item xs={12} md={8}>
-        {error && <Alert severity="warning">{error}</Alert>}
+        {error && <Alert severity="warning" sx={{ borderRadius: 3 }}>{error}</Alert>}
         {result && (
           <>
-            {renderTable('By Job Title', result.by_job)}
-            {renderTable('By Country', result.by_country)}
-            {renderTable('By Experience Level', result.by_experience)}
+            {renderTable('By Job Title', result.by_job, '💼')}
+            {renderTable('By Country', result.by_country, '🌍')}
+            {renderTable('By Experience Level', result.by_experience, '📈')}
           </>
+        )}
+        {!result && !error && (
+          <Paper sx={{ p: 6, textAlign: 'center', border: 1, borderColor: 'divider', minHeight: 300, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <CompareArrowsIcon sx={{ fontSize: 80, opacity: 0.2, color: 'warning.main', mb: 2 }} />
+            <Typography variant="h6" color="text.secondary">Select options to compare</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 350, mt: 1 }}>
+              Choose job titles, countries, or experience levels and click "Compare Salaries" to see side-by-side statistics.
+            </Typography>
+          </Paper>
         )}
       </Grid>
     </Grid>

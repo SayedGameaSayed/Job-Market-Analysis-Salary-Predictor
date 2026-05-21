@@ -18,20 +18,48 @@ export function ThemeProvider({ children }) {
           mode,
           ...(mode === 'dark'
             ? {
-                primary: { main: '#7b8cd1' },
-                secondary: { main: '#90caf9' },
-                background: { default: '#0a0e1a', paper: '#13182b' },
+                primary: { main: '#7b8cd1', light: '#a8b5e0', dark: '#5a6db8' },
+                secondary: { main: '#00d4aa', light: '#33dbbd', dark: '#00a888' },
+                background: { default: '#0b0f1c', paper: '#13182b' },
+                text: { primary: '#e8eaf0', secondary: '#9ca3b8' },
+                divider: 'rgba(255,255,255,0.06)',
               }
             : {
-                primary: { main: '#5c6bc0' },
-                secondary: { main: '#1976d2' },
-                background: { default: '#f5f5f5', paper: '#ffffff' },
+                primary: { main: '#5c6bc0', light: '#7986cb', dark: '#3949ab' },
+                secondary: { main: '#00bfa5', light: '#33ccb8', dark: '#009688' },
+                background: { default: '#f0f2f5', paper: '#ffffff' },
+                text: { primary: '#1a1a2e', secondary: '#555770' },
+                divider: 'rgba(0,0,0,0.08)',
               }),
         },
         typography: {
-          fontFamily: '"Inter", "Roboto", "Helvetica", sans-serif',
+          fontFamily: '"Inter", "Segoe UI", "Roboto", sans-serif',
+          h3: { fontWeight: 800, letterSpacing: '-0.5px' },
+          h4: { fontWeight: 700, letterSpacing: '-0.3px' },
+          h5: { fontWeight: 700 },
+          h6: { fontWeight: 600 },
         },
-        shape: { borderRadius: 12 },
+        shape: { borderRadius: 16 },
+        components: {
+          MuiPaper: {
+            styleOverrides: {
+              root: {
+                backgroundImage: 'none',
+                backdropFilter: mode === 'dark' ? 'blur(20px)' : 'none',
+              },
+            },
+          },
+          MuiButton: {
+            styleOverrides: {
+              root: {
+                textTransform: 'none',
+                fontWeight: 600,
+                borderRadius: 12,
+                padding: '10px 24px',
+              },
+            },
+          },
+        },
       }),
     [mode]
   );
