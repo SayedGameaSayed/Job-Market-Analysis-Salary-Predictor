@@ -6,58 +6,46 @@ const ThemeContext = createContext({ toggleTheme: () => {}, mode: 'dark' });
 
 export const useTheme = () => useContext(ThemeContext);
 
+const darkPalette = {
+  primary: { main: '#818cf8', light: '#a5b4fc', dark: '#6366f1' },
+  secondary: { main: '#34d399', light: '#6ee7b7', dark: '#10b981' },
+  background: { default: '#0f1117', paper: '#1a1b23' },
+  text: { primary: '#e2e8f0', secondary: '#94a3b8' },
+  divider: 'rgba(255,255,255,0.06)',
+};
+
+const lightPalette = {
+  primary: { main: '#6366f1', light: '#818cf8', dark: '#4f46e5' },
+  secondary: { main: '#10b981', light: '#34d399', dark: '#059669' },
+  background: { default: '#f1f5f9', paper: '#ffffff' },
+  text: { primary: '#0f172a', secondary: '#64748b' },
+  divider: 'rgba(0,0,0,0.08)',
+};
+
 export function ThemeProvider({ children }) {
   const [mode, setMode] = useState('dark');
-
   const toggleTheme = () => setMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
 
   const theme = useMemo(
     () =>
       createTheme({
-        palette: {
-          mode,
-          ...(mode === 'dark'
-            ? {
-                primary: { main: '#7b8cd1', light: '#a8b5e0', dark: '#5a6db8' },
-                secondary: { main: '#00d4aa', light: '#33dbbd', dark: '#00a888' },
-                background: { default: '#0b0f1c', paper: '#13182b' },
-                text: { primary: '#e8eaf0', secondary: '#9ca3b8' },
-                divider: 'rgba(255,255,255,0.06)',
-              }
-            : {
-                primary: { main: '#5c6bc0', light: '#7986cb', dark: '#3949ab' },
-                secondary: { main: '#00bfa5', light: '#33ccb8', dark: '#009688' },
-                background: { default: '#f0f2f5', paper: '#ffffff' },
-                text: { primary: '#1a1a2e', secondary: '#555770' },
-                divider: 'rgba(0,0,0,0.08)',
-              }),
-        },
+        palette: { mode, ...(mode === 'dark' ? darkPalette : lightPalette) },
         typography: {
           fontFamily: '"Inter", "Segoe UI", "Roboto", sans-serif',
-          h3: { fontWeight: 800, letterSpacing: '-0.5px' },
           h4: { fontWeight: 700, letterSpacing: '-0.3px' },
           h5: { fontWeight: 700 },
           h6: { fontWeight: 600 },
         },
-        shape: { borderRadius: 16 },
+        shape: { borderRadius: 12 },
         components: {
-          MuiPaper: {
-            styleOverrides: {
-              root: {
-                backgroundImage: 'none',
-                backdropFilter: mode === 'dark' ? 'blur(20px)' : 'none',
-              },
-            },
-          },
+          MuiPaper: { styleOverrides: { root: { backgroundImage: 'none' } } },
           MuiButton: {
             styleOverrides: {
-              root: {
-                textTransform: 'none',
-                fontWeight: 600,
-                borderRadius: 12,
-                padding: '10px 24px',
-              },
+              root: { textTransform: 'none', fontWeight: 600, borderRadius: 10, padding: '8px 20px' },
             },
+          },
+          MuiCard: {
+            styleOverrides: { root: { backgroundImage: 'none' } },
           },
         },
       }),
