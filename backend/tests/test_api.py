@@ -77,3 +77,22 @@ def test_export_csv():
     resp = client.get("/api/export/csv")
     assert resp.status_code == 200
     assert "text/csv" in resp.headers["content-type"]
+
+
+def test_image_to_markdown():
+    """Create a simple test image and verify the pipeline runs."""
+    try:
+        import cv2
+        import numpy as np
+        img = np.ones((400, 600, 3), dtype=np.uint8) * 255
+        cv2.putText(img, "Dashboard Metrics", (50, 80), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 0), 2)
+        cv2.putText(img, "Total Records: 5341", (50, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+        cv2.putText(img, "Avg Salary: $146258", (50, 180), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+        success, buf = cv2.imencode(".png", img)
+        assert success
+        resp = client.post("/api/image-to-markdown", files={"file": ("test.png", buf.tobytes(), "image/png")})
+        assert resp.status_code == 200
+        data = resp.json()
+        assert "markdown" in data
+    except ImportError:
+        pass  # Skip if cv2 not available

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException, UploadFile, File
 from fastapi.responses import Response
 
 from app.api.schemas import (
@@ -8,6 +8,7 @@ from app.api.schemas import (
 )
 from app.services.analysis import AnalysisService
 from app.services.predictor import PredictorService
+from app.services.imagemd import image_bytes_to_markdown
 from app.utils.exporters import export_csv, export_pdf
 from app.utils.helpers import logger
 
@@ -156,4 +157,19 @@ async def export_data_pdf(
         )
     except Exception as e:
         logger.error(f"PDF export error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/image-to-markdown")
+async def image_to_markdown(file: UploadFile = File(...)):
+    try:
+        contents = await file.read()
+        if not contents:
+            raise HTTPException(status_code=400, detail="Empty file")
+        markdown = image_bytes_to_markdown(contents, file.filename or "upload.png")
+        return {"markdown": markdown, "filename": file.filename}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Image-to-markdown error: {e}")
         raise HTTPException(status_code=500, detail=str(e))

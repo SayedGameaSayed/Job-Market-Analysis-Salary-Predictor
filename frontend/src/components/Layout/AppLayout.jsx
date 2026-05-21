@@ -11,6 +11,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import CompareIcon from '@mui/icons-material/CompareArrows';
+import ImageIcon from '@mui/icons-material/Image';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import { useTheme as useAppTheme } from '../../context/ThemeContext';
 
@@ -19,6 +20,7 @@ const navItems = [
   { path: '/predictor', label: 'Salary Predictor', icon: <BarChartIcon />, desc: 'AI-powered estimation' },
   { path: '/explorer', label: 'Data Explorer', icon: <TableChartIcon />, desc: 'Browse & filter records' },
   { path: '/comparison', label: 'Comparison', icon: <CompareIcon />, desc: 'Side-by-side analysis' },
+  { path: '/image-to-markdown', label: 'Image → Markdown', icon: <ImageIcon />, desc: 'OCR dashboard to markdown' },
 ];
 
 export default function AppLayout() {
