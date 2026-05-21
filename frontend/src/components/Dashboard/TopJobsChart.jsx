@@ -8,29 +8,26 @@ export default function TopJobsChart({ data }) {
   const theme = useTheme();
   if (!data?.length) return null;
   const chartData = data.map(d => ({
-    name: d.job_title?.length > 22 ? d.job_title?.slice(0, 22) + '…' : d.job_title,
+    name: d.job_title?.length > 15 ? d.job_title?.slice(0, 15) + '…' : d.job_title,
     salary: Math.round(d.avg_salary),
-    count: d.count,
   }));
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
-      <Paper sx={{ p: 3, height: '100%', border: 1, borderColor: 'divider' }}>
-        <Typography variant="h6" mb={2} display="flex" alignItems="center" gap={1}>
-          <Box sx={{ width: 4, height: 20, bgcolor: 'primary.main', borderRadius: 2, display: 'inline-block' }} />
+      <Paper sx={{ p: 2.5, height: '100%', border: 1, borderColor: 'divider' }}>
+        <Typography variant="subtitle1" fontWeight={700} mb={1.5} fontSize="0.95rem">
           Top Paying Data Roles
         </Typography>
-        <ResponsiveContainer width="100%" height={360}>
-          <BarChart data={chartData} layout="vertical" margin={{ left: 10 }}>
-            <CartesianGrid strokeDasharray="3 3" opacity={0.15} horizontal={false} />
-            <XAxis type="number" tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 12 }} />
-            <YAxis type="category" dataKey="name" width={180} tick={{ fontSize: 12 }} />
+        <ResponsiveContainer width="100%" height={280}>
+          <BarChart data={chartData} margin={{ bottom: 50, left: 0, right: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+            <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-35} textAnchor="end" height={60} interval={0} />
+            <YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 10 }} width={40} />
             <Tooltip
-              contentStyle={{ borderRadius: 12, border: 'none', backgroundColor: theme.palette.mode === 'dark' ? '#1a2040' : '#fff', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}
+              contentStyle={{ borderRadius: 8, border: 'none', backgroundColor: theme.palette.mode === 'dark' ? '#1a2040' : '#fff', boxShadow: '0 4px 16px rgba(0,0,0,0.2)', fontSize: '0.8rem' }}
               formatter={(v) => [`$${v?.toLocaleString()}`, 'Avg Salary']}
-              labelFormatter={(l) => chartData.find(d => d.name === l)?.count ? `${l} (${chartData.find(d => d.name === l).count} records)` : l}
             />
-            <Bar dataKey="salary" radius={[0, 6, 6, 0]} barSize={20}>
+            <Bar dataKey="salary" radius={[4, 4, 0, 0]} barSize={18}>
               {chartData.map((_, i) => <Cell key={i} fill={colors[i % colors.length]} />)}
             </Bar>
           </BarChart>
