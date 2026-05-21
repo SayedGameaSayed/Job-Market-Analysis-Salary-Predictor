@@ -1,3 +1,7 @@
+# Root CSV files (only in backend/data/)
+/jobs_in_data.csv
+/cleaned_jobs_data.csv
+
 # Python
 __pycache__/
 *.py[cod]
