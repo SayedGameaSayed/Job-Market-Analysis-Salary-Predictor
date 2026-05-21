@@ -70,15 +70,24 @@ class AnalysisService:
 
         if job_titles:
             filtered = df[df["job_title"].str.lower().isin([j.lower() for j in job_titles])]
-            result["by_job"] = filtered.groupby("job_title")["salary_in_usd"].describe().to_dict()
+            grouped = filtered.groupby("job_title")["salary_in_usd"].describe().reset_index()
+            result["by_job"] = grouped.rename(columns={
+                "job_title": "key", "25%": "p25", "50%": "p50", "75%": "p75"
+            }).to_dict(orient="records")
 
         if countries:
             filtered = df[df["company_location"].str.lower().isin([c.lower() for c in countries])]
-            result["by_country"] = filtered.groupby("company_location")["salary_in_usd"].describe().to_dict()
+            grouped = filtered.groupby("company_location")["salary_in_usd"].describe().reset_index()
+            result["by_country"] = grouped.rename(columns={
+                "company_location": "key", "25%": "p25", "50%": "p50", "75%": "p75"
+            }).to_dict(orient="records")
 
         if experience_levels:
             filtered = df[df["experience_level"].str.lower().isin([e.lower() for e in experience_levels])]
-            result["by_experience"] = filtered.groupby("experience_level")["salary_in_usd"].describe().to_dict()
+            grouped = filtered.groupby("experience_level")["salary_in_usd"].describe().reset_index()
+            result["by_experience"] = grouped.rename(columns={
+                "experience_level": "key", "25%": "p25", "50%": "p50", "75%": "p75"
+            }).to_dict(orient="records")
 
         return result
 

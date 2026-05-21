@@ -57,8 +57,7 @@ export default function ComparisonView() {
   const totalSelected = Object.values(selections).reduce((a, b) => a + b.length, 0);
 
   const renderTable = (label, data, icon) => {
-    if (!data) return null;
-    const rows = Object.entries(data).map(([key, val]) => ({ key, ...val }));
+    if (!data || !data.length) return null;
     return (
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
         <Paper sx={{ p: 3, mt: 2.5, border: 1, borderColor: 'divider' }}>
@@ -78,7 +77,7 @@ export default function ComparisonView() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((r) => (
+                {data.map((r) => (
                   <TableRow key={r.key} hover>
                     <TableCell><Chip label={r.key} size="small" variant="outlined" /></TableCell>
                     <TableCell align="right">{r.count}</TableCell>
