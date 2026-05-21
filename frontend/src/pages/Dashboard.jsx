@@ -1,12 +1,22 @@
 import { useState, useEffect } from 'react';
-import { Grid, Typography, Box, Paper, Chip } from '@mui/material';
-import { motion } from 'framer-motion';
-import StatsCards from '../components/Dashboard/StatsCards';
-import TopJobsChart from '../components/Dashboard/TopJobsChart';
-import ExperienceChart from '../components/Dashboard/ExperienceChart';
-import CountryChart from '../components/Dashboard/CountryChart';
-import ExportPanel from '../components/Export/ExportPanel';
+import {
+  Grid, Card, CardContent, Typography, Box, Skeleton, Chip,
+} from '@mui/material';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from 'recharts';
 import { getStats, getTopJobs, getSalaryByExperience, getTopCountries } from '../api/client';
+
+const COLORS = ['#7b8cd1', '#00d4aa', '#f6a85b', '#c084fc', '#f472b6', '#60a5fa', '#34d399', '#a78bfa', '#fb923c', '#22d3ee'];
+
+function ChartCard({ title, height = 320, children }) {
+  return (
+    <Card variant="outlined" sx={{ height: '100%' }}>
+      <CardContent sx={{ '&:last-child': { pb: 2 } }}>
+        <Typography variant="subtitle1" fontWeight={700} gutterBottom>{title}</Typography>
+        {children}
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
@@ -15,53 +25,95 @@ export default function Dashboard() {
   const [countries, setCountries] = useState([]);
 
   useEffect(() => {
-    Promise.all([getStats(), getTopJobs(10), getSalaryByExperience(), getTopCountries(10)])
+    Promise.all([getStats(), getTopJobs(8), getSalaryByExperience(), getTopCountries(10)])
       .then(([s, j, e, c]) => { setStats(s); setTopJobs(j); setExperience(e); setCountries(c); });
   }, []);
 
+  const statCards = [
+    { label: 'Total Records', value: stats?.total_records?.toLocaleString(), color: '#7b8cd1' },
+    { label: 'Avg Salary', value: `$${stats?.avg_salary?.toLocaleString()}`, color: '#00d4aa' },
+    { label: 'Job Titles', value: stats?.unique_job_titles, color: '#f6a85b' },
+    { label: 'Countries', value: stats?.unique_countries, color: '#c084fc' },
+  ];
+
   return (
     <Box>
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <Paper sx={{
-          p: 4, mb: 4,
-          background: (theme) => theme.palette.mode === 'dark'
-            ? 'linear-gradient(135deg, #13182b 0%, #1a2040 50%, #13182b 100%)'
-            : 'linear-gradient(135deg, #f0f2ff 0%, #e8ecf8 50%, #f0f2ff 100%)',
-          border: 1, borderColor: 'divider',
-          position: 'relative', overflow: 'hidden',
-        }}>
-          <Box sx={{ position: 'absolute', top: -50, right: -50, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(123,140,209,0.08) 0%, transparent 70%)' }} />
-          <Box sx={{ position: 'absolute', bottom: -80, left: '30%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,212,170,0.05) 0%, transparent 70%)' }} />
-          <Box sx={{ position: 'relative', zIndex: 1 }}>
-            <Chip label="Live Dashboard" size="small" color="primary" variant="outlined" sx={{ mb: 2 }} />
-            <Typography variant="h3" gutterBottom>
-              Global Data Science<br />Salary Insights
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mb: 1 }}>
-              Comprehensive analysis of {stats?.total_records?.toLocaleString() || '…'} salary records across {stats?.unique_countries || '…'} countries, {stats?.unique_job_titles || '…'} job roles, and 4 experience levels.
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
-              <Chip label={`📊 ${stats?.total_records?.toLocaleString() || '…'} records`} size="small" />
-              <Chip label={`🌍 ${stats?.unique_countries || '…'} countries`} size="small" />
-              <Chip label={`💼 ${stats?.unique_job_titles || '…'} roles`} size="small" />
-              <Chip label={`💰 Avg $${stats?.avg_salary?.toLocaleString() || '…'}`} size="small" />
-            </Box>
-          </Box>
-        </Paper>
-      </motion.div>
+      <Box mb={3}>
+        <Typography variant="h5" fontWeight={800}>Dashboard</Typography>
+        <Typography variant="body2" color="text.secondary">Global Data Science Salary Overview</Typography>
+      </Box>
 
-      <StatsCards stats={stats} />
-      <ExportPanel />
+      {/* Metric Cards */}
+      <Grid container spacing={2} mb={3}>
+        {statCards.map((c, i) => (
+          <Grid item xs={6} md={3} key={c.label}>
+            <Card variant="outlined" sx={{ borderTop: 3, borderTopColor: c.color }}>
+              <CardContent sx={{ '&:last-child': { pb: 2 } }}>
+                <Typography variant="body2" color="text.secondary" gutterBottom>{c.label}</Typography>
+                {c.value ? (
+                  <Typography variant="h5" fontWeight={800}>{c.value}</Typography>
+                ) : (
+                  <Skeleton width="60%" />
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
-      <Grid container spacing={2.5} mt={1}>
-        <Grid item xs={12}>
-          <TopJobsChart data={topJobs} />
+      <Grid container spacing={2}>
+        {/* Top Jobs */}
+        <Grid item xs={12} md={6}>
+          <ChartCard title="Top Paying Data Roles">
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart data={topJobs} layout="vertical" margin={{ left: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} horizontal={false} />
+                <XAxis type="number" tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
+                <YAxis type="category" dataKey="job_title" width={170} tick={{ fontSize: 11 }} />
+                <Tooltip formatter={(v) => [`$${v?.toLocaleString()}`, 'Avg Salary']} />
+                <Bar dataKey="avg_salary" radius={[0, 4, 4, 0]} barSize={16}>
+                  {topJobs.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
         </Grid>
-        <Grid item xs={12}>
-          <ExperienceChart data={experience} />
+
+        {/* Experience */}
+        <Grid item xs={12} md={6}>
+          <ChartCard title="Salary by Experience Level">
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart data={experience}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                <XAxis dataKey="level" tick={{ fontSize: 12 }} />
+                <YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} width={50} />
+                <Tooltip formatter={(v) => [`$${v?.toLocaleString()}`, 'Avg Salary']} />
+                <Bar dataKey="avg_salary" radius={[4, 4, 0, 0]} barSize={60}>
+                  {experience.map((d) => {
+                    const colors = { 'Entry-level': '#60a5fa', 'Mid-level': '#7b8cd1', 'Senior': '#f6a85b', 'Executive': '#c084fc' };
+                    return <Cell key={d.level} fill={colors[d.level] || '#7b8cd1'} />;
+                  })}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
         </Grid>
+
+        {/* Countries */}
         <Grid item xs={12}>
-          <CountryChart data={countries} />
+          <ChartCard title="Top 10 Countries by Average Salary" height={360}>
+            <ResponsiveContainer width="100%" height={360}>
+              <BarChart data={countries}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                <XAxis dataKey="country" tick={{ fontSize: 12 }} />
+                <YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} width={50} />
+                <Tooltip formatter={(v) => [`$${v?.toLocaleString()}`, 'Avg Salary']} />
+                <Bar dataKey="avg_salary" radius={[4, 4, 0, 0]} barSize={40}>
+                  {countries.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
         </Grid>
       </Grid>
     </Box>
