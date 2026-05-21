@@ -56,25 +56,30 @@ export default function SalaryForm() {
             <form onSubmit={handleSubmit}>
               <Grid container spacing={2.5}>
                 <Grid item xs={12}>
-                  <TextField select fullWidth label="Job Title" name="job_title" value={form.job_title} onChange={handleChange} required SelectProps={{ displayEmpty: true }}>
+                  <TextField select fullWidth label="Job Title" name="job_title" value={form.job_title} onChange={handleChange} required
+                    SelectProps={{ displayEmpty: true }}
+                    MenuProps={{ PaperProps: { style: { minWidth: 300 } } }}>
                     <MenuItem value="" disabled>Select a job title</MenuItem>
                     {options.job_title.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
                   </TextField>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField select fullWidth label="Job Category" name="job_category" value={form.job_category} onChange={handleChange} required>
+                  <TextField select fullWidth label="Job Category" name="job_category" value={form.job_category} onChange={handleChange} required
+                    MenuProps={{ PaperProps: { style: { minWidth: 300 } } }}>
                     <MenuItem value="" disabled>Select category</MenuItem>
                     {options.job_category.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
                   </TextField>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField select fullWidth label="Experience Level" name="experience_level" value={form.experience_level} onChange={handleChange} required>
+                  <TextField select fullWidth label="Experience Level" name="experience_level" value={form.experience_level} onChange={handleChange} required
+                    MenuProps={{ PaperProps: { style: { minWidth: 300 } } }}>
                     <MenuItem value="" disabled>Select level</MenuItem>
                     {options.experience_level.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
                   </TextField>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField select fullWidth label="Company Location" name="company_location" value={form.company_location} onChange={handleChange} required>
+                  <TextField select fullWidth label="Company Location" name="company_location" value={form.company_location} onChange={handleChange} required
+                    MenuProps={{ PaperProps: { style: { minWidth: 300 } } }}>
                     <MenuItem value="" disabled>Select country</MenuItem>
                     {options.company_location.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
                   </TextField>

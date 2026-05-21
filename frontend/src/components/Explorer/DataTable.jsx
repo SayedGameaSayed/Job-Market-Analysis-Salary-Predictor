@@ -53,21 +53,24 @@ export default function DataTable() {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={3}>
               <TextField select fullWidth size="small" label="Category" value={filters.job_category}
-                onChange={(e) => { setFilters({ ...filters, job_category: e.target.value }); setPage(0); }}>
+                onChange={(e) => { setFilters({ ...filters, job_category: e.target.value }); setPage(0); }}
+                MenuProps={{ PaperProps: { style: { minWidth: 300 } } }}>
                 <MenuItem value="">All</MenuItem>
                 {filterOptions.job_category.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
               </TextField>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
               <TextField select fullWidth size="small" label="Experience" value={filters.experience_level}
-                onChange={(e) => { setFilters({ ...filters, experience_level: e.target.value }); setPage(0); }}>
+                onChange={(e) => { setFilters({ ...filters, experience_level: e.target.value }); setPage(0); }}
+                MenuProps={{ PaperProps: { style: { minWidth: 300 } } }}>
                 <MenuItem value="">All</MenuItem>
                 {filterOptions.experience_level.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
               </TextField>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
               <TextField select fullWidth size="small" label="Country" value={filters.company_location}
-                onChange={(e) => { setFilters({ ...filters, company_location: e.target.value }); setPage(0); }}>
+                onChange={(e) => { setFilters({ ...filters, company_location: e.target.value }); setPage(0); }}
+                MenuProps={{ PaperProps: { style: { minWidth: 300 } } }}>
                 <MenuItem value="">All</MenuItem>
                 {filterOptions.company_location.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
               </TextField>
