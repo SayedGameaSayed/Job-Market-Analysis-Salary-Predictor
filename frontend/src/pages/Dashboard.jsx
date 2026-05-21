@@ -54,10 +54,10 @@ export default function Dashboard() {
       <ExportPanel />
 
       <Grid container spacing={2.5} mt={1}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={12} lg={12}>
           <TopJobsChart data={topJobs} />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={12} lg={12}>
           <ExperienceChart data={experience} />
         </Grid>
         <Grid item xs={12}>
