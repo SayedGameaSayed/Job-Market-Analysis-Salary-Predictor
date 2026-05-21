@@ -25,6 +25,7 @@ class PredictRequest(BaseModel):
 
 
 class PredictResponse(BaseModel):
+    model_config = {'protected_namespaces': ()}
     predicted_salary_usd: float
     confidence_interval: Optional[dict] = None
     model_used: str
@@ -70,6 +71,7 @@ class ComparisonResponse(BaseModel):
 
 
 class ModelInfoResponse(BaseModel):
+    model_config = {'protected_namespaces': ()}
     r2_score: float
     mae: float
     rmse: float

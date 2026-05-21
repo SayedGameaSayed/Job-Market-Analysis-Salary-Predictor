@@ -1,0 +1,22 @@
+{
+  "r2_score": 0.3634,
+  "mae": 39021.47,
+  "rmse": 51380.08,
+  "feature_importance": {
+    "work_year": 0.0316,
+    "job_title": 0.2105,
+    "job_category": 0.2508,
+    "experience_level": 0.2039,
+    "company_location": 0.3032
+  },
+  "model_type": "RandomForestRegressor",
+  "training_date": "2026-05-21T20:06:54.533328",
+  "feature_columns": [
+    "work_year",
+    "job_title",
+    "job_category",
+    "experience_level",
+    "company_location"
+  ],
+  "n_samples": 9355
+}

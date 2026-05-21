@@ -76,4 +76,4 @@ def test_model_info():
 def test_export_csv():
     resp = client.get("/api/export/csv")
     assert resp.status_code == 200
-    assert resp.headers["content-type"] == "text/csv"
+    assert "text/csv" in resp.headers["content-type"]
