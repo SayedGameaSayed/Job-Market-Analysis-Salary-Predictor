@@ -1,11 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import {
   Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   TablePagination, TextField, MenuItem, Grid, Typography, CircularProgress,
-  Box, Chip, Stack,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import { getFilteredData, getUniqueValues } from '../../api/client';
 
 export default function DataTable() {
@@ -34,99 +31,82 @@ export default function DataTable() {
       .finally(() => setLoading(false));
   }, [filters]);
 
-  const activeCount = Object.values(filters).filter(Boolean).length;
-  const paginatedData = useMemo(() => data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage), [data, page, rowsPerPage]);
+  const paginatedData = useMemo(
+    () => data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [data, page, rowsPerPage]
+  );
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-      <Paper sx={{ border: 1, borderColor: 'divider', overflow: 'hidden' }}>
-        <Box sx={{ px: 3, pt: 2.5, pb: 2 }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h6" display="flex" alignItems="center" gap={1}>
-              <SearchIcon color="primary" /> Explore Salary Data
-            </Typography>
-            {activeCount > 0 && (
-              <Chip label={`${activeCount} active`} size="small" color="primary" variant="outlined" />
-            )}
-          </Stack>
+    <Paper>
+      <Typography variant="h6" sx={{ p: 2, pb: 0 }}>Filter Data</Typography>
+      <Grid container spacing={2} sx={{ p: 2 }}>
+        <Grid item xs={12} sm={3}>
+          <TextField select fullWidth size="small" label="Category" value={filters.job_category}
+            onChange={(e) => { setFilters({ ...filters, job_category: e.target.value }); setPage(0); }}>
+            <MenuItem value="">All</MenuItem>
+            {filterOptions.job_category.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
+          </TextField>
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <TextField select fullWidth size="small" label="Experience" value={filters.experience_level}
+            onChange={(e) => { setFilters({ ...filters, experience_level: e.target.value }); setPage(0); }}>
+            <MenuItem value="">All</MenuItem>
+            {filterOptions.experience_level.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
+          </TextField>
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <TextField select fullWidth size="small" label="Country" value={filters.company_location}
+            onChange={(e) => { setFilters({ ...filters, company_location: e.target.value }); setPage(0); }}>
+            <MenuItem value="">All</MenuItem>
+            {filterOptions.company_location.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
+          </TextField>
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <TextField fullWidth size="small" type="number" label="Year" value={filters.work_year}
+            onChange={(e) => { setFilters({ ...filters, work_year: e.target.value }); setPage(0); }} />
+        </Grid>
+      </Grid>
 
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={3}>
-              <TextField select fullWidth size="small" label="Category" value={filters.job_category}
-                onChange={(e) => { setFilters({ ...filters, job_category: e.target.value }); setPage(0); }}
-                MenuProps={{ PaperProps: { style: { minWidth: 300 } } }}>
-                <MenuItem value="">All</MenuItem>
-                {filterOptions.job_category.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <TextField select fullWidth size="small" label="Experience" value={filters.experience_level}
-                onChange={(e) => { setFilters({ ...filters, experience_level: e.target.value }); setPage(0); }}
-                MenuProps={{ PaperProps: { style: { minWidth: 300 } } }}>
-                <MenuItem value="">All</MenuItem>
-                {filterOptions.experience_level.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <TextField select fullWidth size="small" label="Country" value={filters.company_location}
-                onChange={(e) => { setFilters({ ...filters, company_location: e.target.value }); setPage(0); }}
-                MenuProps={{ PaperProps: { style: { minWidth: 300 } } }}>
-                <MenuItem value="">All</MenuItem>
-                {filterOptions.company_location.map((o) => <MenuItem key={o} value={o}>{o}</MenuItem>)}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <TextField fullWidth size="small" type="number" label="Year" value={filters.work_year}
-                onChange={(e) => { setFilters({ ...filters, work_year: e.target.value }); setPage(0); }}
-                placeholder="2023" inputProps={{ min: 2020, max: 2024 }} />
-            </Grid>
-          </Grid>
-        </Box>
-
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>
-        ) : (
-          <>
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 700 }}>Job Title</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Category</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Experience</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Location</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Salary</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Year</TableCell>
+      {loading ? (
+        <CircularProgress sx={{ display: 'block', mx: 'auto', my: 4 }} />
+      ) : (
+        <>
+          <TableContainer>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Job Title</TableCell>
+                  <TableCell>Category</TableCell>
+                  <TableCell>Experience</TableCell>
+                  <TableCell>Location</TableCell>
+                  <TableCell align="right">Salary (USD)</TableCell>
+                  <TableCell align="right">Year</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paginatedData.map((row, i) => (
+                  <TableRow key={i} hover>
+                    <TableCell>{row.job_title}</TableCell>
+                    <TableCell>{row.job_category}</TableCell>
+                    <TableCell>{row.experience_level}</TableCell>
+                    <TableCell>{row.company_location}</TableCell>
+                    <TableCell align="right">${row.salary_in_usd?.toLocaleString()}</TableCell>
+                    <TableCell align="right">{row.work_year}</TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedData.map((row, i) => (
-                    <TableRow key={i} hover>
-                      <TableCell>{row.job_title}</TableCell>
-                      <TableCell><Chip label={row.job_category} size="small" variant="outlined" /></TableCell>
-                      <TableCell>{row.experience_level}</TableCell>
-                      <TableCell>{row.company_location}</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                        ${row.salary_in_usd?.toLocaleString()}
-                      </TableCell>
-                      <TableCell align="right">{row.work_year}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              component="div"
-              count={data.length}
-              page={page}
-              onPageChange={(e, p) => setPage(p)}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
-              rowsPerPageOptions={[10, 25, 50, 100]}
-            />
-          </>
-        )}
-      </Paper>
-    </motion.div>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            component="div"
+            count={data.length}
+            page={page}
+            onPageChange={(e, p) => setPage(p)}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
+          />
+        </>
+      )}
+    </Paper>
   );
 }
